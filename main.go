@@ -68,11 +68,18 @@ func main() {
 	// fmt.Println("Update Successfully!", product)
 
 	// DELETE PROD
-	err = deleteProduct(3)
+	// err = deleteProduct(3)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Println("Delete Successfully!")
+
+	// GET PRODS
+	products, err := getProducts()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Delete Successfully!")
+	fmt.Println("Get Successfully!", products)
 }
 
 func createProduct(product *Product) error {
@@ -98,6 +105,29 @@ func getProduct(id int) (Product, error) {
 	}
 
 	return p, nil
+}
+
+func getProducts() ([]Product, error) {
+	rows, err := db.Query("SELECT id, name, price FROM products;")
+	if err != nil {
+		return nil, err
+	}
+
+	var products []Product
+	for rows.Next() {
+		var p Product
+		err := rows.Scan(&p.ID, &p.Name, &p.Price)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, p)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return products, nil
 }
 
 func updateProduct(id int, product *Product) (Product, error) {
